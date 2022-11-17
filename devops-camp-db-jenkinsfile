@@ -45,14 +45,7 @@ pipeline {
                           }
                       }
                   }
-        stage('Security scanning') {
-            steps {
-                  withCredentials([usernamePassword(credentialsId: 'tpalmer-harbor-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                      echo "Scanning $APP_IMAGE_NAME image"
-                      sh 'python harbor_scanner.py -i $APP_IMAGE_NAME -r $HARBOR_REGISTRY -p $HARBOR_PROJECT -c ${USERNAME}:${PASSWORD}'
-                  }
-            }
-        }
+        
                   post {
                       //TODO: clean local docker images
                       always {
@@ -68,6 +61,14 @@ pipeline {
                       }
                   }
               }
+              stage('Security scanning') {
+            steps {
+                  withCredentials([usernamePassword(credentialsId: 'tpalmer-harbor-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                      echo "Scanning $APP_IMAGE_NAME image"
+                      sh 'python harbor_scanner.py -i $APP_IMAGE_NAME -r $HARBOR_REGISTRY -p $HARBOR_PROJECT -c ${USERNAME}:${PASSWORD}'
+                  }
+            }
+        }
               stage('Deploy') {
                   steps {
                       echo "Deployment stage"
