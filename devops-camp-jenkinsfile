@@ -37,6 +37,14 @@ pipeline {
                 echo "Building application image"
                 //TODO("Lab 4 - Artifact Management"): build the docker app image
             }
+        stage('Security scanning') {
+            steps {
+                  withCredentials([usernamePassword(credentialsId: 'tpalmer-harbor-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                      echo "Scanning $APP_IMAGE_NAME image"
+                      sh 'python harbor_scanner.py -i $APP_IMAGE_NAME -r $HARBOR_REGISTRY -p $HARBOR_PROJECT -c ${USERNAME}:${PASSWORD}'
+                  }
+            }
+        }
             post {
                 always {
                     echo "Clean local $APP_IMAGE_NAME image"
